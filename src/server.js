@@ -6,8 +6,16 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+import bodyParser from 'body-parser';
+
+
+
 //config view engine
 configViewEngine(app);
+
+//config body-parser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 //init web routes
 initWebRoutes(app);
