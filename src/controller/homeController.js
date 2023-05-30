@@ -1,19 +1,15 @@
-// get the client
-import mysql from 'mysql2';
-
-// create the connection to database
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'jwt'
-});
+import userService from '../service/userService'
 
 const handleHelloworld = (req, res) => {
     return res.render("home.ejs");
 }
 
-const handleUserpage = (req, res) => {
-    return res.render("user.ejs");
+const handleUserpage = async (req, res) => {
+
+    let userList = await userService.getUserList();
+    await userService.deleteUser(4);
+
+    return res.render("user.ejs", { userList });
 }
 
 const handleCreateNewUser = (req, res) => {
@@ -21,23 +17,43 @@ const handleCreateNewUser = (req, res) => {
     let password = req.body.password;
     let username = req.body.username;
 
-    // simple query
-    connection.query(
-        'INSERT INTO users ( email, password, username) VALUES( ?, ?, ?)', [email, password, username],
-        function (err, results, fields) {
-            if (err) {
-                console.log(err);
-            }
-            console.log(results); // results contains rows returned by server
-        }
-    );
+    userService.createNewUser(email, password, username);
 
-    console.log('>>> check request: ', req.body)
-    return res.send("handleCreateNewUser");
+    return res.redirect("/user");
+}
+
+const handleDeleteUser = async (req, res) => {
+
+    await userService.deleteUser(req.params.id);
+    return res.redirect("/user");
+}
+
+const getUpdateUserPage = async (req, res) => {
+    let id = req.params.id;
+    let user = await userService.getUserById(id);
+    let userData = {};
+    if (user && user.length > 0) {
+        userData = user[0];
+    }
+    return res.render("user-update.ejs", { userData });
+}
+
+const handleUpdateUser = async (req, res) => {
+    let email = req.body.email;
+    let username = req.body.username;
+    let id = req.body.id;
+    
+    await userService.updateUserInfor(email, username, id);
+
+    return res.redirect("/user");
 }
 
 module.exports = {
     handleHelloworld,
     handleUserpage,
-    handleCreateNewUser
+    handleCreateNewUser,
+    handleDeleteUser,
+    getUpdateUserPage,
+    handleUpdateUser,
+
 }

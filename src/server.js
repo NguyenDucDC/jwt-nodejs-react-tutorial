@@ -1,5 +1,5 @@
 import express from "express";
-import configViewEngine from "./configs/viewEngine";
+import configViewEngine from "./config/viewEngine";
 import initWebRoutes from "./routes/web";
 require("dotenv").config();
 
@@ -7,8 +7,6 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 import bodyParser from 'body-parser';
-
-
 
 //config view engine
 configViewEngine(app);
